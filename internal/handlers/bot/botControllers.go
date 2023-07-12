@@ -2,8 +2,11 @@ package bot
 
 import (
 	"beak/internal/models"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -125,6 +128,43 @@ func (b *BotController) saveBot(c *gin.Context) {
 	fmt.Println(botErr.RowsAffected)
 
 	c.JSON(http.StatusOK, gin.H{"success": true})
+}
+
+func toBase64(b []byte) string {
+	return base64.StdEncoding.EncodeToString(b)
+}
+
+func (b *BotController) getLogo(c *gin.Context) {
+
+	// fmt.Println(reflect.TypeOf(f))
+
+	// Read the entire file into a byte slice
+	bytes, err := ioutil.ReadFile("./logo.png")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var base64Encoding string
+
+	// Determine the content type of the image file
+	mimeType := http.DetectContentType(bytes)
+
+	// Prepend the appropriate URI scheme header depending
+	// on the MIME type
+	switch mimeType {
+	case "image/jpeg":
+		base64Encoding += "data:image/jpeg;base64,"
+	case "image/png":
+		base64Encoding += "data:image/png;base64,"
+	}
+
+	// Append the base64 encoded output
+	base64Encoding += toBase64(bytes)
+
+	// Print the full base64 representation of the image
+	fmt.Println(base64Encoding)
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "res": base64Encoding})
 }
 
 // if resErr := u.Database.Debug().Create(&user); resErr.Error != nil {

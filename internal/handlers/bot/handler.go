@@ -15,6 +15,7 @@ const (
 	getBots      = "/getBots"
 	newBot       = "/newBot"
 	getBot       = "/getBot"
+	getLogo      = "/getLogo"
 )
 
 type botHandler struct {
@@ -30,7 +31,7 @@ func (bH *botHandler) Register(router *gin.RouterGroup) {
 
 	mwS := middleware.MiddlewareStorage{Database: bH.db}
 	jwtMiddleware := mwS.JwtMiddleware(bH.db)
-
+	router.POST(getLogo, bC.getLogo)
 	router.Use(jwtMiddleware.MiddlewareFunc())
 	{
 		router.POST(newBot, bC.newBot)
@@ -38,6 +39,7 @@ func (bH *botHandler) Register(router *gin.RouterGroup) {
 		router.POST(getBot, bC.getBot)
 		router.POST(saveBotToken, bC.saveBot)
 		router.POST(saveBot, bC.saveBot)
+		
 		// router.GET(refrashToken, jwtMiddleware.RefreshHandler)
 		// router.GET(readUser, bH.Read)
 		// router.PUT(updateUser, bH.Update)
